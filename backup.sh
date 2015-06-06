@@ -1,18 +1,26 @@
 #!/bin/bash
 
-##  This program is free software: you can redistribute it and/or modify
-##  it under the terms of the GNU General Public License as published by
-##  the Free Software Foundation, either version 3 of the License, or
-##  (at your option) any later version.
+##  The MIT License (MIT)
 ## 
-##  This program is distributed in the hope that it will be useful,
-##  but WITHOUT ANY WARRANTY; without even the implied warranty of
-##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-##  GNU General Public License for more details.
+## Copyright (c) 2015 Kim D. Jeker (kije) <github@kije.ch>
 ## 
-##  You should have received a copy of the GNU General Public License
-##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+## Permission is hereby granted, free of charge, to any person obtaining a copy
+## of this software and associated documentation files (the "Software"), to deal
+## in the Software without restriction, including without limitation the rights
+## to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+## copies of the Software, and to permit persons to whom the Software is
+## furnished to do so, subject to the following conditions:
+## 
+## The above copyright notice and this permission notice shall be included in
+## all copies or substantial portions of the Software.
+## 
+## THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+## IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+## FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+## AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+## LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+## OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+## THE SOFTWARE.
 
 ## Usage: backup.sh 
 ##
@@ -59,12 +67,10 @@ FTPU="FTP_SERVER_USERNAME_GOES_HERE"
 FTPP="FTP_SERVER_PASSWORD_GOES_HERE"
 FTPS="FTP_SERVER_ADDRESS_GOES_HERE"
 
-
 ### Mysql ###
 MUSER="MYSQL_USER"
 MPASS="MYSQL_PASSWORD"
 MHOST="MYSQL_HOST"
-
 
 ### Binaries ###
 ## Todo maybe replace with fixed paths?
@@ -84,7 +90,6 @@ CURL="$(which curl)"
 
 
 TAR_DIR_BUFFER=""
-
 
 echo "------------------------------------------"
 echo "Date: $(date)"
@@ -144,18 +149,15 @@ do
 	$MYSQLDUMP --skip-add-locks --quote-names --skip-lock-tables --add-drop-table --allow-keywords -q -c -u $MUSER -h $MHOST -p$MPASS $db $i > $FILE
 done
 
-
 ### Backup POSTGRES ###
 echo "Backup PostgreSQL Database Cluster"
 POSTGRES_DB_DIR=$DB_BACKUP/postgre
 echo "Create PostgreSQL DB Dir: $POSTGRES_DB_DIR"
 mkdir -p $POSTGRES_DB_DIR
 
-
 POSTGRES_DUMP_FILE=$POSTGRES_DB_DIR/postgres_dump.sql
 echo "Dump Cluster: $POSTGRES_DUMP_FILE"
 $SU postgres -c "$PGDUMPALL" > $POSTGRES_DUMP_FILE
-
 
 
 ### archive db backups
@@ -186,17 +188,13 @@ BACKUP_MAIN_PIPE=$ARCHIVE
 $MKFIFO $BACKUP_MAIN_PIPE
 
 $TAR --acls --selinux --xattrs -pc $TAR_DIR_BUFFER $BACKUP_DIRECTORY | $P7Z a -si -an -txz -m0=lzma2 -mx=9 -mfb=64 -md=32m -ms=on -mhe=on -mhc=on -p "$ECRYPTION_KEY" -so > $BACKUP_MAIN_PIPE &
-
-
 #################################### END BACKUP ####################################
-
 
 
 #################################### START TRANSFER ################################
 echo
 echo "------------- Upload ---------------"
 echo
-
 
 ### ftp ###
 cd $BACKUP
